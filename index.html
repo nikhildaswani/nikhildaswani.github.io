@@ -1,0 +1,2166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nikhil Daswani - Portfolio</title>
+  <link rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2324150e'/%3E%3Cpath d='M8 40c8-8 18-10 28-6s14 4 20-2v12H8z' fill='%23f4e4c7' fill-opacity='.5'/%3E%3Ctext x='13' y='34' font-size='20' font-family='Arial' fill='%23fff8ed'%3END%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600&family=Space+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #2b1d13;
+      --bg-deep: #181008;
+      --sea: #6f4f38;
+      --sea-bright: #9b7656;
+      --ice: #f4e4c7;
+      --foam: #fff8ed;
+      --amber: #a67049;
+      --sand: #f4e4c7;
+      --text: #fbf1df;
+      --muted: rgba(251, 241, 223, 0.72);
+      --border: rgba(244, 228, 199, 0.18);
+      --panel: rgba(47, 31, 19, 0.68);
+      --panel-strong: rgba(28, 18, 10, 0.82);
+      --shadow: 0 28px 80px rgba(0, 0, 0, 0.35);
+      --radius-xl: 32px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --mono: "Space Mono", monospace;
+      --sans: "Commissioner", sans-serif;
+      --display: "Fraunces", serif;
+      --ease: cubic-bezier(0.2, 0.9, 0.2, 1);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      overflow-x: hidden;
+    }
+
+    body:not(.entered) {
+      overflow: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    #scene {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 90%, rgba(198, 133, 83, 0.24), transparent 46%),
+        linear-gradient(180deg, rgba(29, 19, 28, 0.18), rgba(17, 11, 9, 0.9));
+    }
+
+    #coastCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      filter: none;
+    }
+
+    #scene::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 34%, rgba(255, 235, 206, 0.08), transparent 32%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 26%);
+      mix-blend-mode: screen;
+      opacity: 0.3;
+    }
+
+    #scene::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, transparent 36%, rgba(28, 18, 10, 0.28) 70%, rgba(28, 18, 10, 0.8) 100%);
+    }
+
+    .mist-layer {
+      position: fixed;
+      inset: auto 0 0 0;
+      height: 34vh;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 50% 5%, rgba(166, 112, 73, 0.17), transparent 54%),
+        linear-gradient(180deg, rgba(244, 228, 199, 0.12), rgba(244, 228, 199, 0));
+      filter: blur(24px);
+      opacity: 0.75;
+    }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0.1;
+      background-image:
+        radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.18) 0 1px, transparent 1px),
+        radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px);
+      background-size: 18px 18px;
+      mix-blend-mode: soft-light;
+    }
+
+    .worldbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      padding: 1rem clamp(1rem, 2vw, 1.5rem);
+      background: linear-gradient(180deg, rgba(28, 18, 10, 0.82), rgba(28, 18, 10, 0.3));
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(244, 228, 199, 0.08);
+    }
+
+    .brand-chip {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(244, 228, 199, 0.22);
+      border-radius: 14px;
+      background: rgba(61, 40, 25, 0.66);
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      color: var(--foam);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    }
+
+    .worldbar-meta {
+      min-width: 0;
+    }
+
+    .worldbar-label {
+      margin: 0;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(244, 228, 199, 0.72);
+    }
+
+    .worldbar-scene {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 0.4rem;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .worldbar-scene strong {
+      color: var(--sand);
+      font-weight: 600;
+    }
+
+    .worldbar-progress {
+      text-align: right;
+      font-family: var(--mono);
+      font-size: 0.76rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(244, 228, 199, 0.78);
+    }
+
+    .status-strip {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 18;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      padding: 0.7rem clamp(1rem, 2vw, 1.5rem);
+      background: linear-gradient(0deg, rgba(28, 18, 10, 0.84), rgba(28, 18, 10, 0.34));
+      border-top: 1px solid rgba(244, 228, 199, 0.08);
+      backdrop-filter: blur(20px);
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(244, 228, 199, 0.82);
+    }
+
+    .status-strip .live-dot {
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 999px;
+      background: #d7b184;
+      box-shadow: 0 0 16px rgba(215, 177, 132, 0.7);
+    }
+
+    .status-spacer {
+      margin-left: auto;
+    }
+
+    .rail,
+    .mobile-dock {
+      z-index: 19;
+    }
+
+    .rail {
+      position: fixed;
+      right: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 0.65rem;
+    }
+
+    .rail button,
+    .mobile-dock button {
+      border: 0;
+      cursor: pointer;
+      color: inherit;
+      background: none;
+    }
+
+    .rail button {
+      display: grid;
+      grid-template-columns: 1.4rem auto;
+      gap: 0.6rem;
+      align-items: center;
+      padding: 0;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(244, 228, 199, 0.42);
+      transition: color 220ms var(--ease), transform 220ms var(--ease);
+    }
+
+    .rail button::before {
+      content: "";
+      display: block;
+      width: 1rem;
+      height: 1px;
+      background: currentColor;
+      transform-origin: center left;
+      transition: transform 220ms var(--ease);
+    }
+
+    .rail button.active {
+      color: var(--ice);
+      transform: translateX(-0.2rem);
+    }
+
+    .rail button.active::before {
+      transform: scaleX(1.7);
+    }
+
+    .mobile-dock {
+      display: none;
+      position: fixed;
+      left: 50%;
+      bottom: 4rem;
+      transform: translateX(-50%);
+      width: min(92vw, 720px);
+      padding: 0.55rem;
+      gap: 0.45rem;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      background: rgba(45, 30, 18, 0.7);
+      border: 1px solid rgba(244, 228, 199, 0.12);
+      border-radius: 999px;
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .mobile-dock button {
+      padding: 0.55rem 0.2rem;
+      border-radius: 999px;
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(244, 228, 199, 0.54);
+      transition: background 220ms var(--ease), color 220ms var(--ease);
+    }
+
+    .mobile-dock button.active {
+      background: rgba(244, 228, 199, 0.12);
+      color: var(--foam);
+    }
+
+    main {
+      position: relative;
+      z-index: 4;
+      width: min(1180px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 0 0 8rem;
+    }
+
+    .station {
+      min-height: 100svh;
+      display: grid;
+      align-items: center;
+      padding: 7.5rem 0 6rem;
+      position: relative;
+    }
+
+    .station::before {
+      content: attr(data-index);
+      position: absolute;
+      top: 7rem;
+      left: 0;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: rgba(244, 228, 199, 0.36);
+    }
+
+    .station-shell {
+      display: grid;
+      gap: 1.5rem;
+      width: 100%;
+    }
+
+    .hero-shell {
+      max-width: 980px;
+      margin: 0 auto;
+      text-align: center;
+      gap: 1.75rem;
+    }
+
+    .hero-kicker,
+    .station-kicker,
+    .glass-kicker {
+      margin: 0;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      color: rgba(244, 228, 199, 0.74);
+    }
+
+    .hero-title {
+      margin: 0;
+      font-family: var(--display);
+      font-size: clamp(4rem, 11vw, 8.5rem);
+      line-height: 0.88;
+      letter-spacing: -0.05em;
+      color: var(--sand);
+      text-shadow: 0 12px 40px rgba(0, 0, 0, 0.34);
+    }
+
+    .hero-title .surname {
+      display: block;
+      color: var(--ice);
+      font-size: clamp(3.3rem, 9vw, 7rem);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 0.35rem;
+    }
+
+    .hero-copy {
+      margin: 0 auto;
+      max-width: 760px;
+      font-size: clamp(1rem, 1.7vw, 1.18rem);
+      line-height: 1.75;
+      color: var(--muted);
+    }
+
+    .hero-tags,
+    .chip-row,
+    .tool-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+    }
+
+    .hero-tags {
+      justify-content: center;
+    }
+
+    .chip {
+      padding: 0.7rem 0.95rem;
+      border-radius: 999px;
+      border: 1px solid rgba(244, 228, 199, 0.16);
+      background: rgba(45, 30, 18, 0.52);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(242, 239, 232, 0.82);
+      backdrop-filter: blur(14px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.7rem;
+      min-width: 180px;
+      padding: 0.95rem 1.3rem;
+      border-radius: 999px;
+      border: 1px solid rgba(244, 228, 199, 0.18);
+      background: rgba(45, 30, 18, 0.58);
+      color: var(--foam);
+      font-family: var(--mono);
+      font-size: 0.74rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      transition: transform 220ms var(--ease), background 220ms var(--ease), border-color 220ms var(--ease);
+    }
+
+    .action:hover {
+      transform: translateY(-2px);
+      background: rgba(88, 60, 38, 0.74);
+      border-color: rgba(244, 228, 199, 0.32);
+    }
+
+    .action.primary {
+      background: linear-gradient(135deg, rgba(166, 112, 73, 0.16), rgba(244, 228, 199, 0.18));
+      border-color: rgba(166, 112, 73, 0.34);
+    }
+
+    .scroll-mark {
+      display: inline-flex;
+      gap: 0.7rem;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      color: rgba(244, 228, 199, 0.64);
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .scroll-mark::before {
+      content: "";
+      width: 0.65rem;
+      height: 0.65rem;
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      box-shadow: inset 0 0 0 0.16rem transparent;
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%,
+      100% {
+        box-shadow: inset 0 0 0 0 transparent;
+        opacity: 0.45;
+      }
+
+      50% {
+        box-shadow: inset 0 0 0 0.16rem rgba(244, 228, 199, 0.28);
+        opacity: 1;
+      }
+    }
+
+    .glass {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(180deg, rgba(53, 35, 22, 0.74), rgba(34, 22, 14, 0.54));
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      transform: translateY(20px);
+      opacity: 0;
+      transition: transform 700ms var(--ease), opacity 700ms var(--ease), border-color 240ms var(--ease);
+    }
+
+    .glass::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 28%),
+        radial-gradient(circle at 0 0, rgba(244, 228, 199, 0.12), transparent 34%);
+      pointer-events: none;
+    }
+
+    .station.in-view .glass,
+    body.entered .hero-card {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .glass:hover {
+      border-color: rgba(244, 228, 199, 0.26);
+    }
+
+    .hero-card {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: clamp(1.4rem, 2vw, 2rem);
+    }
+
+    .glass-body,
+    .glass-header {
+      position: relative;
+      z-index: 1;
+    }
+
+    .glass-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: flex-end;
+      margin-bottom: 1.35rem;
+      padding: 1.45rem 1.6rem 0;
+    }
+
+    .glass-title {
+      margin: 0.45rem 0 0;
+      font-family: var(--display);
+      font-size: clamp(1.9rem, 3vw, 3rem);
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: var(--sand);
+    }
+
+    .glass-note {
+      max-width: 480px;
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 0.98rem;
+    }
+
+    .glass-badge {
+      padding: 0.7rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(166, 112, 73, 0.28);
+      background: rgba(166, 112, 73, 0.08);
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255, 231, 195, 0.86);
+      white-space: nowrap;
+    }
+
+    .glass-body {
+      padding: 0 1.6rem 1.6rem;
+    }
+
+    .overview-grid,
+    .experience-grid,
+    .skills-grid,
+    .dock-grid {
+      display: grid;
+      gap: 1.2rem;
+    }
+
+    .overview-grid {
+      grid-template-columns: 1.3fr 0.95fr;
+    }
+
+    .profile-copy {
+      margin: 0;
+      line-height: 1.8;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem;
+      margin-top: 1.2rem;
+    }
+
+    .stat-card {
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      background: rgba(42, 28, 18, 0.68);
+      border: 1px solid rgba(244, 228, 199, 0.12);
+    }
+
+    .stat-value {
+      display: block;
+      font-family: var(--display);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 0.95;
+      color: var(--foam);
+    }
+
+    .stat-label,
+    .meta-chip,
+    .list-label {
+      display: block;
+      margin-top: 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(244, 228, 199, 0.68);
+    }
+
+    .profile-points {
+      display: grid;
+      gap: 0.75rem;
+      margin-top: 1.35rem;
+    }
+
+    .point-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .point-row::before {
+      content: "";
+      width: 0.6rem;
+      height: 0.6rem;
+      margin-top: 0.5rem;
+      flex: 0 0 auto;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--amber), var(--ice));
+      box-shadow: 0 0 14px rgba(244, 228, 199, 0.3);
+    }
+
+    .education-stack,
+    .cert-list {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .education-item,
+    .cert-item,
+    .contact-card {
+      padding: 1rem 1.05rem;
+      border-radius: var(--radius-md);
+      background: rgba(42, 28, 18, 0.68);
+      border: 1px solid rgba(244, 228, 199, 0.12);
+    }
+
+    .edu-degree,
+    .cert-name,
+    .contact-title {
+      margin: 0;
+      font-size: 1.02rem;
+      color: var(--sand);
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    .edu-school,
+    .edu-period,
+    .cert-date,
+    .contact-copy {
+      margin: 0.2rem 0 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+
+    .experience-grid {
+      grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+      align-items: start;
+    }
+
+    .role-card,
+    .support-card {
+      height: 100%;
+    }
+
+    .role-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .role-company {
+      margin: 0.3rem 0 0;
+      font-family: var(--display);
+      font-size: clamp(1.8rem, 3vw, 2.7rem);
+      line-height: 0.98;
+      color: var(--foam);
+    }
+
+    .role-title {
+      margin: 0.2rem 0 0;
+      font-size: 1rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .role-meta {
+      text-align: right;
+      min-width: 160px;
+    }
+
+    .role-summary {
+      margin: 0 0 1rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .bullet-list {
+      margin: 0;
+      padding-left: 1.2rem;
+      display: grid;
+      gap: 0.75rem;
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .signal-line {
+      height: 1px;
+      margin: 1.25rem 0;
+      background: linear-gradient(90deg, rgba(244, 228, 199, 0.3), transparent);
+    }
+
+    .support-card .support-title {
+      margin: 0;
+      font-family: var(--display);
+      font-size: 1.5rem;
+      color: var(--sand);
+    }
+
+    .support-copy {
+      margin: 0.7rem 0 0;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+
+    .support-list {
+      display: grid;
+      gap: 0.9rem;
+      margin-top: 1.2rem;
+    }
+
+    .support-block {
+      padding: 0.95rem 1rem;
+      border-radius: var(--radius-md);
+      background: rgba(46, 31, 20, 0.74);
+      border: 1px solid rgba(244, 228, 199, 0.1);
+    }
+
+    .support-block strong {
+      display: block;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(244, 228, 199, 0.72);
+    }
+
+    .support-block span {
+      display: block;
+      margin-top: 0.45rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .skills-grid {
+      grid-template-columns: 1.05fr 0.95fr;
+      align-items: start;
+    }
+
+    .meter-stack {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .meter-card {
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      background: rgba(42, 28, 18, 0.7);
+      border: 1px solid rgba(244, 228, 199, 0.12);
+    }
+
+    .meter-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 0.7rem;
+      font-family: var(--mono);
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(242, 239, 232, 0.82);
+    }
+
+    .meter-track {
+      height: 0.6rem;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .meter-fill {
+      width: var(--fill);
+      height: 100%;
+      border-radius: inherit;
+      transform-origin: left center;
+      transform: scaleX(0);
+      transition: transform 800ms var(--ease);
+      background: linear-gradient(90deg, rgba(244, 228, 199, 0.28), rgba(244, 228, 199, 1));
+      box-shadow: 0 0 18px rgba(244, 228, 199, 0.25);
+    }
+
+    .meter-fill.warm {
+      background: linear-gradient(90deg, rgba(166, 112, 73, 0.26), rgba(166, 112, 73, 1));
+      box-shadow: 0 0 18px rgba(166, 112, 73, 0.22);
+    }
+
+    .station.in-view .meter-fill {
+      transform: scaleX(1);
+    }
+
+    .bay-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .gauge-card {
+      display: grid;
+      gap: 1.1rem;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      background: rgba(42, 28, 18, 0.7);
+      border: 1px solid rgba(244, 228, 199, 0.12);
+    }
+
+    .gauge-ring {
+      --angle: 90deg;
+      width: 6.8rem;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at center, rgba(45, 30, 18, 1) 54%, transparent 55%),
+        conic-gradient(var(--ice) 0 var(--angle), rgba(255, 255, 255, 0.08) var(--angle) 360deg);
+      box-shadow: inset 0 0 0 1px rgba(244, 228, 199, 0.14);
+    }
+
+    .gauge-ring span {
+      font-family: var(--display);
+      font-size: 1.6rem;
+      color: var(--sand);
+    }
+
+    .tool-cloud {
+      gap: 0.65rem;
+    }
+
+    .tool-pill {
+      padding: 0.68rem 0.85rem;
+      border-radius: 999px;
+      background: rgba(46, 31, 20, 0.72);
+      border: 1px solid rgba(244, 228, 199, 0.1);
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(242, 239, 232, 0.86);
+    }
+
+    .dock-grid {
+      grid-template-columns: 0.92fr 1.08fr;
+      align-items: start;
+    }
+
+    .contact-stack {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .contact-link {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: center;
+      padding: 1rem 1.05rem;
+      border-radius: var(--radius-md);
+      background: rgba(42, 28, 18, 0.68);
+      border: 1px solid rgba(244, 228, 199, 0.12);
+      color: var(--foam);
+      transition: transform 220ms var(--ease), border-color 220ms var(--ease), background 220ms var(--ease);
+    }
+
+    .contact-link:hover {
+      transform: translateY(-2px);
+      border-color: rgba(244, 228, 199, 0.24);
+      background: rgba(70, 46, 30, 0.82);
+    }
+
+    .contact-link small {
+      display: block;
+      margin-bottom: 0.3rem;
+      font-family: var(--mono);
+      font-size: 0.64rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(244, 228, 199, 0.72);
+    }
+
+    .contact-link span {
+      color: var(--text);
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    .contact-arrow {
+      font-family: var(--mono);
+      font-size: 1rem;
+      color: rgba(244, 228, 199, 0.8);
+    }
+
+    .closing-copy {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.85;
+    }
+
+    #gate {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 50% 35%, rgba(244, 228, 199, 0.08), transparent 28%),
+        linear-gradient(180deg, rgba(28, 18, 10, 0.94), rgba(28, 18, 10, 0.98));
+      transition: opacity 700ms var(--ease), visibility 700ms var(--ease);
+    }
+
+    #gate.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .gate-panel {
+      width: min(92vw, 580px);
+      padding: 2rem;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(244, 228, 199, 0.16);
+      background: rgba(34, 22, 14, 0.86);
+      box-shadow: var(--shadow);
+      text-align: center;
+      backdrop-filter: blur(20px);
+    }
+
+    .gate-rings {
+      position: relative;
+      width: 6rem;
+      height: 6rem;
+      margin: 0 auto 1.4rem;
+    }
+
+    .gate-rings::before,
+    .gate-rings::after,
+    .gate-core {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(244, 228, 199, 0.28);
+      animation: spin 7s linear infinite;
+    }
+
+    .gate-rings::after {
+      inset: 0.65rem;
+      border-color: rgba(166, 112, 73, 0.3);
+      animation-direction: reverse;
+      animation-duration: 5s;
+    }
+
+    .gate-core {
+      inset: 1.45rem;
+      border-color: rgba(242, 239, 232, 0.42);
+      animation-duration: 3.4s;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .gate-title {
+      margin: 0;
+      font-family: var(--display);
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      color: var(--sand);
+    }
+
+    .gate-copy {
+      margin: 1rem auto 0;
+      max-width: 34rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .gate-meta {
+      margin-top: 1.2rem;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(244, 228, 199, 0.72);
+    }
+
+    .gate-button {
+      margin-top: 1.5rem;
+      padding: 1rem 1.5rem;
+      border: 1px solid rgba(166, 112, 73, 0.28);
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(166, 112, 73, 0.12), rgba(244, 228, 199, 0.16));
+      color: var(--foam);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 220ms var(--ease), border-color 220ms var(--ease);
+    }
+
+    .gate-button:hover {
+      transform: translateY(-2px);
+      border-color: rgba(166, 112, 73, 0.46);
+    }
+
+    @media (max-width: 1080px) {
+      .overview-grid,
+      .experience-grid,
+      .skills-grid,
+      .dock-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .role-meta {
+        text-align: left;
+      }
+
+      .rail {
+        display: none;
+      }
+
+      .mobile-dock {
+        display: grid;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .worldbar {
+        grid-template-columns: auto 1fr;
+      }
+
+      .worldbar-progress {
+        grid-column: 1 / -1;
+        text-align: left;
+      }
+
+      .status-strip {
+        padding-bottom: 5.4rem;
+      }
+
+      .mobile-dock {
+        bottom: 1rem;
+      }
+
+      .station {
+        padding-top: 8.8rem;
+        padding-bottom: 7.5rem;
+      }
+
+      .station::before {
+        top: 8.2rem;
+      }
+
+      .hero-title {
+        font-size: clamp(3.2rem, 17vw, 5.3rem);
+      }
+
+      .hero-title .surname {
+        font-size: clamp(2.3rem, 13vw, 4.4rem);
+      }
+
+      .glass-header,
+      .glass-body {
+        padding-left: 1.2rem;
+        padding-right: 1.2rem;
+      }
+
+      .stat-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .gauge-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .gauge-ring {
+        margin: 0 auto;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="scene" aria-hidden="true">
+    <canvas id="coastCanvas"></canvas>
+  </div>
+  <div class="mist-layer" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="worldbar">
+    <div class="brand-chip" aria-label="ND">ND</div>
+    <div class="worldbar-meta">
+      <p class="worldbar-label">Nikhil Daswani / Portfolio / 2026</p>
+      <div class="worldbar-scene">
+        <strong id="sceneName">Introduction</strong>
+        <span id="sceneLocation">Tax / Accounting / Analytics</span>
+      </div>
+    </div>
+    <div class="worldbar-progress"><span id="progressValue">0%</span> viewed</div>
+  </header>
+
+  <nav class="rail" aria-label="Section navigation">
+    <button type="button" data-jump="intro" class="active">Intro</button>
+    <button type="button" data-jump="chart">Overview</button>
+    <button type="button" data-jump="current">Current</button>
+    <button type="button" data-jump="open-sea">PwC</button>
+    <button type="button" data-jump="reef">Accounting</button>
+    <button type="button" data-jump="bay">Skills</button>
+    <button type="button" data-jump="dock">Contact</button>
+  </nav>
+
+  <nav class="mobile-dock" aria-label="Mobile section navigation">
+    <button type="button" data-jump="intro" class="active">Intro</button>
+    <button type="button" data-jump="chart">Overview</button>
+    <button type="button" data-jump="current">Current</button>
+    <button type="button" data-jump="open-sea">PwC</button>
+    <button type="button" data-jump="reef">Acct</button>
+    <button type="button" data-jump="bay">Skills</button>
+    <button type="button" data-jump="dock">Contact</button>
+  </nav>
+
+  <main>
+    <section id="intro" class="station in-view" data-index="00 / Introduction" data-scene="Introduction"
+      data-loc="Tax / Accounting / Analytics">
+      <div class="station-shell hero-shell">
+        <p class="hero-kicker">Tax / Accounting / Data Analytics</p>
+        <h1 class="hero-title">Nikhil <span class="surname">Daswani</span></h1>
+        <div class="hero-card glass">
+          <div class="glass-body">
+            <p class="hero-copy">
+              Nikhil Daswani is a tax and accounting professional with experience across client-facing
+              tax preparation, U.S. tax compliance, bookkeeping, reconciliations, and analytics-led
+              reporting. His work is defined by accuracy, structure, and clear communication.
+            </p>
+            <div class="hero-tags">
+              <span class="chip">Davenport, IA</span>
+              <span class="chip">H&amp;R Block - Present</span>
+              <span class="chip">PwC Alumni</span>
+              <span class="chip">MAcc in Progress</span>
+              <span class="chip">TCP Passed - 1/4</span>
+            </div>
+            <div class="hero-actions">
+              <a class="action primary" href="#dock">View contact details</a>
+              <a class="action" href="#bay">View skills</a>
+            </div>
+          </div>
+        </div>
+        <div class="scroll-mark">Scroll to view more</div>
+      </div>
+    </section>
+
+    <section id="chart" class="station" data-index="01 / Overview" data-scene="Overview"
+      data-loc="Background and education">
+      <div class="station-shell">
+        <div class="glass">
+          <div class="glass-header">
+            <div>
+              <p class="glass-kicker">Profile overview</p>
+              <h2 class="glass-title">A focused profile across tax, accounting, and analytics.</h2>
+            </div>
+            <div class="glass-badge">Executive overview</div>
+          </div>
+          <div class="glass-body overview-grid">
+            <div>
+              <p class="profile-copy">
+                Nikhil Daswani operates where client-facing tax work, disciplined accounting, and
+                practical analytics meet. The core strength is not just technical coverage, but the
+                ability to stay clear and steady across returns, reconciliations, reporting, and
+                cross-team communication.
+              </p>
+              <div class="stat-grid">
+                <article class="stat-card">
+                  <span class="stat-value">2.5+</span>
+                  <span class="stat-label">Years of experience</span>
+                </article>
+                <article class="stat-card">
+                  <span class="stat-value">3</span>
+                  <span class="stat-label">Organizations</span>
+                </article>
+                <article class="stat-card">
+                  <span class="stat-value">1 / 4</span>
+                  <span class="stat-label">CPA sections cleared</span>
+                </article>
+                <article class="stat-card">
+                  <span class="stat-value">21+</span>
+                  <span class="stat-label">Tools listed</span>
+                </article>
+              </div>
+              <div class="profile-points">
+                <div class="point-row">Client conversations, preparation accuracy, and follow-through all stay anchored in practical business needs.</div>
+                <div class="point-row">Experience spans trust, business, and individual tax returns, bookkeeping, reconciliations, and analytics tooling.</div>
+                <div class="point-row">The operating style is direct: organized files, clean workflow handoffs, and measurable output.</div>
+              </div>
+            </div>
+            <div class="education-stack">
+              <article class="education-item">
+                <p class="list-label">Current study</p>
+                <h3 class="edu-degree">Master of Accountancy with Data Analytics</h3>
+                <p class="edu-school">Arkansas State University - Jonesboro, AR</p>
+                <p class="edu-period">Jan 2025 - Present</p>
+              </article>
+              <article class="education-item">
+                <p class="list-label">Foundation</p>
+                <h3 class="edu-degree">Bachelor of Commerce (Honors), Financial Management</h3>
+                <p class="edu-school">Kumaun University - India</p>
+                <p class="edu-period">Jan 2017 - Dec 2020</p>
+              </article>
+              <article class="education-item">
+                <p class="list-label">Current focus</p>
+                <h3 class="edu-degree">Tax operations, accounting systems, and analytics tooling</h3>
+                <p class="edu-period">Built around tax preparation, client service, reporting, and workflow efficiency.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="current" class="station" data-index="02 / Current Role" data-scene="H&amp;R Block"
+      data-loc="Current experience">
+      <div class="station-shell">
+        <div class="glass">
+          <div class="glass-header">
+            <div>
+              <p class="glass-kicker">Current role</p>
+              <h2 class="glass-title">H&amp;R Block</h2>
+              <p class="glass-note">Current work centered on tax preparation, client support, and accurate delivery.</p>
+            </div>
+            <div class="glass-badge">Tax Analyst / Dec 2025 - Present / Rockford, IL</div>
+          </div>
+          <div class="glass-body experience-grid">
+            <article class="role-card">
+              <div class="role-head">
+                <div>
+                  <p class="role-title">Role focus</p>
+                  <h3 class="role-company">Client-ready tax execution</h3>
+                </div>
+                <div class="role-meta">
+                  <span class="meta-chip">Individual, business, and trust returns</span>
+                </div>
+              </div>
+              <p class="role-summary">
+                This role combines direct client conversations, active tax work, and full ownership
+                of delivery. It requires technical preparation, careful review, and calm communication
+                in the same workflow.
+              </p>
+              <div class="signal-line"></div>
+              <ul class="bullet-list">
+                <li>Conduct tax interviews with clients face to face and through virtual tools.</li>
+                <li>Prepare complete and accurate individual, business, and trust tax returns.</li>
+                <li>Support business growth, client retention, and additional products and services.</li>
+                <li>Provide clients with IRS support and tax notice services.</li>
+                <li>Apply hands-on accounting, finance, bookkeeping, and tax knowledge in daily work.</li>
+                <li>Communicate effectively in person, by phone, and in writing.</li>
+              </ul>
+            </article>
+            <article class="support-card glass-body">
+              <h3 class="support-title">Why it matters</h3>
+              <p class="support-copy">
+                It proves an ability to carry technical detail into the real world of people,
+                deadlines, and revenue-facing service.
+              </p>
+              <div class="support-list">
+                <div class="support-block">
+                  <strong>Client trust</strong>
+                  <span>Interviews, retention, and support all require clarity under pressure.</span>
+                </div>
+                <div class="support-block">
+                  <strong>Compliance focus</strong>
+                  <span>Accuracy is non-negotiable across return types and tax notice workflows.</span>
+                </div>
+                <div class="support-block">
+                  <strong>Practical scope</strong>
+                  <span>Accounting, bookkeeping, and tax come together in one role.</span>
+                </div>
+              </div>
+              <div class="chip-row" style="margin-top:1.1rem;">
+                <span class="chip">Individual returns</span>
+                <span class="chip">Business returns</span>
+                <span class="chip">Trust returns</span>
+                <span class="chip">IRS support</span>
+                <span class="chip">Client-facing</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="open-sea" class="station" data-index="03 / PwC Experience" data-scene="PwC"
+      data-loc="U.S. tax compliance">
+      <div class="station-shell">
+        <div class="glass">
+          <div class="glass-header">
+            <div>
+              <p class="glass-kicker">PwC experience</p>
+              <h2 class="glass-title">PricewaterhouseCoopers</h2>
+              <p class="glass-note">A larger-scale environment shaped by U.S. tax compliance, forms, and asset management complexity.</p>
+            </div>
+            <div class="glass-badge">US Tax Associate / Jun 2023 - Oct 2024 / India</div>
+          </div>
+          <div class="glass-body experience-grid">
+            <article class="role-card">
+              <div class="role-head">
+                <div>
+                  <p class="role-title">Role focus</p>
+                  <h3 class="role-company">U.S. tax work at institutional scale</h3>
+                </div>
+                <div class="role-meta">
+                  <span class="meta-chip">Forms 1065, 1120, K-1, REIT testing</span>
+                </div>
+              </div>
+              <p class="role-summary">
+                PwC added depth: more regulation, more asset classes, more forms, and stronger
+                process discipline. This is where structured tax work and rapid software learning
+                were pressure-tested.
+              </p>
+              <div class="signal-line"></div>
+              <ul class="bullet-list">
+                <li>Prepared federal income tax workpapers and returns for U.S. engagements.</li>
+                <li>Worked on federal Forms 1065, 1120, filed extensions, and foreign filing forms.</li>
+                <li>Supported asset and wealth management clients across hedge funds, FOF, and private equity.</li>
+                <li>Prepared tax estimates and final work papers aligned with U.S. regulations.</li>
+                <li>Handled partners' K-1 preparation, tax estimates, asset diversification tests, and REIT testing.</li>
+                <li>Adapted quickly to new software and workflows to improve delivery efficiency.</li>
+              </ul>
+            </article>
+            <article class="support-card glass-body">
+              <h3 class="support-title">What it added</h3>
+              <p class="support-copy">
+                This experience sharpened form accuracy, documentation habits, and the ability to
+                move across technical systems without losing control of the details.
+              </p>
+              <div class="support-list">
+                <div class="support-block">
+                  <strong>Regulatory discipline</strong>
+                  <span>Work aligned tightly with U.S. tax compliance expectations.</span>
+                </div>
+                <div class="support-block">
+                  <strong>Asset complexity</strong>
+                  <span>Coverage included hedge funds, funds of funds, and private equity structures.</span>
+                </div>
+                <div class="support-block">
+                  <strong>Software fluency</strong>
+                  <span>Learning speed mattered because workflows shifted fast.</span>
+                </div>
+              </div>
+              <div class="chip-row" style="margin-top:1.1rem;">
+                <span class="chip">Form 1065</span>
+                <span class="chip">Form 1120</span>
+                <span class="chip">K-1</span>
+                <span class="chip">REIT testing</span>
+                <span class="chip">AWM</span>
+                <span class="chip">Foreign filing</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="reef" class="station" data-index="04 / Accounting Foundation" data-scene="MY CPE ONE"
+      data-loc="Bookkeeping and reporting">
+      <div class="station-shell">
+        <div class="glass">
+          <div class="glass-header">
+            <div>
+              <p class="glass-kicker">Accounting foundation</p>
+              <h2 class="glass-title">MY CPE ONE</h2>
+              <p class="glass-note">Early accounting experience focused on bookkeeping, reconciliations, reporting, and clean records.</p>
+            </div>
+            <div class="glass-badge">US Accounting Associate / Jun 2022 - Mar 2023 / India</div>
+          </div>
+          <div class="glass-body experience-grid">
+            <article class="role-card">
+              <div class="role-head">
+                <div>
+                  <p class="role-title">Role focus</p>
+                  <h3 class="role-company">Accounting fundamentals with range</h3>
+                </div>
+                <div class="role-meta">
+                  <span class="meta-chip">Bookkeeping, payroll, reconciliations, reporting</span>
+                </div>
+              </div>
+              <p class="role-summary">
+                This period built the habit system: transaction organization, reconciliation logic,
+                review cadence, and the discipline required for reliable financial records.
+              </p>
+              <div class="signal-line"></div>
+              <ul class="bullet-list">
+                <li>Handled bookkeeping and categorization of bank and credit card transactions.</li>
+                <li>Completed bank, credit card, payroll, and inter-company reconciliations.</li>
+                <li>Prepared month-end and year-end journal entries.</li>
+                <li>Performed monthly, quarterly, and yearly account review and reconciliation.</li>
+                <li>Worked across investment accounting, trust accounting, real estate, and automobile files.</li>
+                <li>Supported payroll processing plus accounts receivable and payables reconciliation.</li>
+                <li>Prepared reports and financial discussions with strong cross-team communication.</li>
+              </ul>
+            </article>
+            <article class="support-card glass-body">
+              <h3 class="support-title">Why it matters</h3>
+              <p class="support-copy">
+                Strong tax and analytics work still depends on the quality of the underlying records.
+                This role made the operational base reliable.
+              </p>
+              <div class="support-list">
+                <div class="support-block">
+                  <strong>Record hygiene</strong>
+                  <span>Clean categorization and reconciliations reduce downstream noise.</span>
+                </div>
+                <div class="support-block">
+                  <strong>Range</strong>
+                  <span>Exposure spanned payroll, trusts, real estate, and varied accounting tasks.</span>
+                </div>
+                <div class="support-block">
+                  <strong>Reporting support</strong>
+                  <span>Output was organized for review, discussion, and accurate decision-making.</span>
+                </div>
+              </div>
+              <div class="chip-row" style="margin-top:1.1rem;">
+                <span class="chip">Bookkeeping</span>
+                <span class="chip">Reconciliations</span>
+                <span class="chip">Journal entries</span>
+                <span class="chip">Payroll</span>
+                <span class="chip">Trust accounting</span>
+                <span class="chip">Financial reporting</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="bay" class="station" data-index="05 / Skills" data-scene="Skills"
+      data-loc="Software and tools">
+      <div class="station-shell">
+        <div class="glass">
+          <div class="glass-header">
+            <div>
+              <p class="glass-kicker">Skills</p>
+              <h2 class="glass-title">Tools and software used across tax, accounting, and analytics.</h2>
+            </div>
+            <div class="glass-badge">Technical skills</div>
+          </div>
+          <div class="glass-body skills-grid">
+            <div class="meter-stack">
+              <article class="meter-card"><div class="meter-top"><span>Excel Advanced</span><span>95%</span></div><div class="meter-track"><div class="meter-fill warm" style="--fill:95%;"></div></div></article>
+              <article class="meter-card"><div class="meter-top"><span>GoSystem</span><span>90%</span></div><div class="meter-track"><div class="meter-fill warm" style="--fill:90%;"></div></div></article>
+              <article class="meter-card"><div class="meter-top"><span>QuickBooks</span><span>88%</span></div><div class="meter-track"><div class="meter-fill warm" style="--fill:88%;"></div></div></article>
+              <article class="meter-card"><div class="meter-top"><span>Power BI</span><span>82%</span></div><div class="meter-track"><div class="meter-fill" style="--fill:82%;"></div></div></article>
+              <article class="meter-card"><div class="meter-top"><span>SQL</span><span>78%</span></div><div class="meter-track"><div class="meter-fill" style="--fill:78%;"></div></div></article>
+              <article class="meter-card"><div class="meter-top"><span>Python</span><span>74%</span></div><div class="meter-track"><div class="meter-fill" style="--fill:74%;"></div></div></article>
+              <article class="meter-card"><div class="meter-top"><span>Alteryx</span><span>76%</span></div><div class="meter-track"><div class="meter-fill" style="--fill:76%;"></div></div></article>
+            </div>
+            <div class="bay-grid">
+              <article class="gauge-card">
+                <div class="gauge-ring"><span>25%</span></div>
+                <div>
+                  <p class="glass-kicker">CPA status</p>
+                  <h3 class="contact-title">TCP passed, one section complete.</h3>
+                  <p class="contact-copy">CPA exam candidate with a Dec 2026 target across all four sections.</p>
+                </div>
+              </article>
+              <article class="contact-card">
+                <p class="glass-kicker">Data and analytics</p>
+                <div class="tool-cloud" style="margin-top:0.9rem;">
+                  <span class="tool-pill">Excel</span>
+                  <span class="tool-pill">Power BI</span>
+                  <span class="tool-pill">SQL</span>
+                  <span class="tool-pill">Python</span>
+                  <span class="tool-pill">Alteryx</span>
+                </div>
+              </article>
+              <article class="contact-card">
+                <p class="glass-kicker">Tax and accounting software</p>
+                <div class="tool-cloud" style="margin-top:0.9rem;">
+                  <span class="tool-pill">GoSystem</span>
+                  <span class="tool-pill">ADP Payroll</span>
+                  <span class="tool-pill">QuickBooks Desktop</span>
+                  <span class="tool-pill">QuickBooks Online</span>
+                  <span class="tool-pill">Bill.com</span>
+                </div>
+              </article>
+              <article class="contact-card">
+                <p class="glass-kicker">Workflow and communication</p>
+                <div class="tool-cloud" style="margin-top:0.9rem;">
+                  <span class="tool-pill">CCH Axcess Workflow</span>
+                  <span class="tool-pill">Time Capture</span>
+                  <span class="tool-pill">Onvio</span>
+                  <span class="tool-pill">ShareFile</span>
+                  <span class="tool-pill">Outlook</span>
+                  <span class="tool-pill">Teams</span>
+                  <span class="tool-pill">Mattermost</span>
+                  <span class="tool-pill">Slack</span>
+                  <span class="tool-pill">PowerPoint</span>
+                  <span class="tool-pill">MS Word</span>
+                  <span class="tool-pill">Adobe Acrobat</span>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="dock" class="station" data-index="06 / Contact" data-scene="Contact"
+      data-loc="Get in touch">
+      <div class="station-shell">
+        <div class="glass">
+          <div class="glass-header">
+            <div>
+              <p class="glass-kicker">Contact</p>
+              <h2 class="glass-title">Get in touch.</h2>
+              <p class="glass-note">For roles across tax, accounting, and analytics that value accurate work and clear communication.</p>
+            </div>
+            <div class="glass-badge">Resume contact</div>
+          </div>
+          <div class="glass-body dock-grid">
+            <div class="contact-stack">
+              <article class="contact-card">
+                <p class="glass-kicker">Profile summary</p>
+                <h3 class="contact-title">Nikhil Daswani</h3>
+                <p class="contact-copy">Davenport, IA</p>
+                <p class="closing-copy" style="margin-top:0.9rem;">
+                  Tax, accounting, and data analytics experience shaped by client-facing work,
+                  reporting discipline, and practical software fluency.
+                </p>
+              </article>
+              <a class="contact-link" href="mailto:nikdaswani1799@gmail.com">
+                <div><small>Email</small><span>nikdaswani1799@gmail.com</span></div>
+                <span class="contact-arrow">-&gt;</span>
+              </a>
+              <a class="contact-link" href="tel:+18709194747">
+                <div><small>Phone</small><span>870-919-4747</span></div>
+                <span class="contact-arrow">-&gt;</span>
+              </a>
+              <a class="contact-link" href="https://linkedin.com/in/nikdaswani1799" target="_blank" rel="noopener noreferrer">
+                <div><small>LinkedIn</small><span>linkedin.com/in/nikdaswani1799</span></div>
+                <span class="contact-arrow">-&gt;</span>
+              </a>
+            </div>
+            <div class="cert-list">
+              <article class="cert-item"><p class="glass-kicker">Credential 01</p><h3 class="cert-name">CPA Exam Candidate - TCP Passed, 1 of 4 Sections</h3><p class="cert-date">Target: Dec 2026</p></article>
+              <article class="cert-item"><p class="glass-kicker">Credential 02</p><h3 class="cert-name">Alteryx Foundation Micro-Credential Certificate</h3><p class="cert-date">Jan 2025</p></article>
+              <article class="cert-item"><p class="glass-kicker">Credential 03</p><h3 class="cert-name">PGCM - Post Graduate Certificate in International Accounting and Analytics</h3><p class="cert-date">Dec 2024</p></article>
+              <article class="cert-item"><p class="glass-kicker">Credential 04</p><h3 class="cert-name">Diploma in Professional Accounting and Finance (US CPA)</h3><p class="cert-date">Mar 2022</p></article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="status-strip" aria-live="polite">
+    <span class="live-dot" aria-hidden="true"></span>
+    <span>Available</span>
+    <span id="statusLocation">Tax / Accounting / Analytics</span>
+    <span class="status-spacer"></span>
+    <span>Nikhil Daswani</span>
+  </div>
+
+  <div id="gate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+    <div class="gate-panel">
+      <div class="gate-rings">
+        <div class="gate-core"></div>
+      </div>
+      <p class="gate-meta">Nikhil Daswani / Portfolio / 2026</p>
+      <h2 id="gateTitle" class="gate-title">Portfolio</h2>
+      <p class="gate-copy">
+        A focused portfolio covering tax, accounting, analytics, education, and contact information.
+      </p>
+      <button id="enterButton" class="gate-button" type="button">Open portfolio</button>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const canvas = document.getElementById('coastCanvas');
+      const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
+      const enterButton = document.getElementById('enterButton');
+      const gate = document.getElementById('gate');
+      const progressValue = document.getElementById('progressValue');
+      const sceneName = document.getElementById('sceneName');
+      const sceneLocation = document.getElementById('sceneLocation');
+      const statusLocation = document.getElementById('statusLocation');
+      const sections = Array.from(document.querySelectorAll('.station'));
+      const jumpButtons = Array.from(document.querySelectorAll('[data-jump]'));
+
+      let width = 0;
+      let height = 0;
+      let dpr = 1;
+      let started = false;
+      let lastFrame = 0;
+
+      const stars = Array.from({ length: 72 }, (_, index) => ({
+        x: ((index * 0.137) % 1) * 0.88 + 0.06,
+        y: ((index * 0.071) % 1) * 0.32 + 0.04,
+        size: 0.7 + ((index * 1.9) % 1) * 1.2,
+        phase: index * 0.73
+      }));
+
+      const stallLayout = [
+        { x: 0.72, scale: 0.82, phase: 0.2 },
+        { x: 0.81, scale: 0.94, phase: 1.4 },
+        { x: 0.9, scale: 0.86, phase: 2.5 }
+      ];
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function lerp(start, end, amount) {
+        return start + (end - start) * amount;
+      }
+
+      function resizeCanvas() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function currentProgress() {
+        const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        return clamp(window.scrollY / max, 0, 1);
+      }
+
+      function shorelineYAt(xNorm) {
+        return height * (0.68 + xNorm * 0.05 + Math.sin(xNorm * Math.PI * 1.7 + 0.45) * 0.018);
+      }
+
+      function drawSky() {
+        const sky = ctx.createLinearGradient(0, 0, 0, height);
+        sky.addColorStop(0, '#191222');
+        sky.addColorStop(0.28, '#3a2a49');
+        sky.addColorStop(0.56, '#6b4a63');
+        sky.addColorStop(0.82, '#db9c74');
+        sky.addColorStop(1, '#f0c29c');
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, width, height);
+
+        const horizonGlow = ctx.createRadialGradient(width * 0.5, height * 0.58, 0, width * 0.5, height * 0.58, width * 0.55);
+        horizonGlow.addColorStop(0, 'rgba(255, 204, 156, 0.18)');
+        horizonGlow.addColorStop(0.48, 'rgba(255, 177, 120, 0.1)');
+        horizonGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = horizonGlow;
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.fillStyle = 'rgba(33, 22, 39, 0.2)';
+        ctx.beginPath();
+        ctx.ellipse(width * 0.25, height * 0.22, width * 0.16, height * 0.06, -0.08, 0, Math.PI * 2);
+        ctx.ellipse(width * 0.7, height * 0.18, width * 0.2, height * 0.07, 0.06, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function drawStars(timestamp) {
+        const twinkleTime = timestamp * 0.00045;
+        ctx.fillStyle = '#fff4e6';
+        stars.forEach((star) => {
+          const alpha = 0.22 + ((Math.sin(twinkleTime + star.phase) + 1) * 0.5) * 0.42;
+          ctx.globalAlpha = alpha;
+          ctx.beginPath();
+          ctx.arc(star.x * width, star.y * height, star.size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+      }
+
+      function drawDistantCoastline(horizonY) {
+        ctx.fillStyle = 'rgba(42, 29, 37, 0.86)';
+        ctx.beginPath();
+        ctx.moveTo(-20, horizonY + height * 0.02);
+        ctx.lineTo(width * 0.08, horizonY - height * 0.02);
+        ctx.lineTo(width * 0.2, horizonY + height * 0.01);
+        ctx.lineTo(width * 0.33, horizonY - height * 0.025);
+        ctx.lineTo(width * 0.5, horizonY + height * 0.008);
+        ctx.lineTo(width * 0.63, horizonY - height * 0.018);
+        ctx.lineTo(width * 0.77, horizonY + height * 0.012);
+        ctx.lineTo(width * 0.9, horizonY - height * 0.026);
+        ctx.lineTo(width + 20, horizonY + height * 0.01);
+        ctx.lineTo(width + 20, horizonY + height * 0.16);
+        ctx.lineTo(-20, horizonY + height * 0.16);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(24, 17, 24, 0.95)';
+        ctx.beginPath();
+        ctx.moveTo(-20, horizonY + height * 0.09);
+        ctx.lineTo(width * 0.12, horizonY + height * 0.06);
+        ctx.lineTo(width * 0.28, horizonY + height * 0.1);
+        ctx.lineTo(width * 0.45, horizonY + height * 0.065);
+        ctx.lineTo(width * 0.62, horizonY + height * 0.1);
+        ctx.lineTo(width * 0.82, horizonY + height * 0.06);
+        ctx.lineTo(width + 20, horizonY + height * 0.085);
+        ctx.lineTo(width + 20, horizonY + height * 0.12);
+        ctx.lineTo(-20, horizonY + height * 0.12);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function drawLighthouse(timestamp, horizonY) {
+        const x = width * 0.21;
+        const baseY = horizonY + height * 0.015;
+        const towerHeight = height * 0.19;
+        const blink = prefersReducedMotion
+          ? 0.62
+          : 0.22 + Math.pow((Math.sin(timestamp * 0.0012) + 1) * 0.5, 2.1) * 0.74;
+
+        ctx.fillStyle = 'rgba(34, 22, 24, 0.96)';
+        ctx.beginPath();
+        ctx.moveTo(x - width * 0.042, baseY + height * 0.035);
+        ctx.lineTo(x - width * 0.012, baseY - height * 0.012);
+        ctx.lineTo(x + width * 0.034, baseY + height * 0.016);
+        ctx.lineTo(x + width * 0.06, baseY + height * 0.05);
+        ctx.lineTo(x - width * 0.06, baseY + height * 0.05);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#f0e4d1';
+        ctx.beginPath();
+        ctx.moveTo(x - width * 0.012, baseY);
+        ctx.lineTo(x + width * 0.01, baseY);
+        ctx.lineTo(x + width * 0.018, baseY - towerHeight);
+        ctx.lineTo(x - width * 0.02, baseY - towerHeight);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#85553f';
+        ctx.fillRect(x - width * 0.007, baseY - towerHeight * 0.78, width * 0.014, towerHeight * 0.14);
+        ctx.fillRect(x - width * 0.006, baseY - towerHeight * 0.44, width * 0.012, towerHeight * 0.12);
+
+        ctx.fillStyle = '#37242b';
+        ctx.fillRect(x - width * 0.025, baseY - towerHeight - height * 0.012, width * 0.05, height * 0.02);
+        ctx.fillRect(x - width * 0.018, baseY - towerHeight - height * 0.03, width * 0.036, height * 0.02);
+
+        ctx.fillStyle = `rgba(255, 228, 186, ${0.55 + blink * 0.28})`;
+        ctx.fillRect(x - width * 0.011, baseY - towerHeight - height * 0.024, width * 0.022, height * 0.012);
+
+        const lampGlow = ctx.createRadialGradient(x, baseY - towerHeight - height * 0.018, 0, x, baseY - towerHeight - height * 0.018, width * 0.1);
+        lampGlow.addColorStop(0, `rgba(255, 222, 175, ${blink * 0.55})`);
+        lampGlow.addColorStop(0.5, `rgba(255, 184, 112, ${blink * 0.22})`);
+        lampGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = lampGlow;
+        ctx.fillRect(x - width * 0.1, baseY - towerHeight - height * 0.12, width * 0.2, height * 0.24);
+
+        return {
+          x,
+          y: baseY - towerHeight - height * 0.018,
+          alpha: blink
+        };
+      }
+
+      function drawBeaconBeam(lighthouse, horizonY) {
+        const beamTop = lighthouse.y - height * 0.018;
+        const beamBottom = horizonY + height * 0.09;
+        const beamEndX = width * 0.62;
+        const beam = ctx.createLinearGradient(lighthouse.x, lighthouse.y, beamEndX, beamBottom);
+        beam.addColorStop(0, `rgba(255, 225, 176, ${lighthouse.alpha * 0.34})`);
+        beam.addColorStop(0.42, `rgba(255, 210, 156, ${lighthouse.alpha * 0.16})`);
+        beam.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = beam;
+        ctx.beginPath();
+        ctx.moveTo(lighthouse.x, beamTop);
+        ctx.lineTo(beamEndX, beamBottom - height * 0.05);
+        ctx.lineTo(beamEndX, beamBottom + height * 0.04);
+        ctx.lineTo(lighthouse.x, lighthouse.y + height * 0.01);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function drawOcean(timestamp, horizonY, lighthouse) {
+        const ocean = ctx.createLinearGradient(0, horizonY, 0, height);
+        ocean.addColorStop(0, '#3d6388');
+        ocean.addColorStop(0.3, '#244766');
+        ocean.addColorStop(0.76, '#10253b');
+        ocean.addColorStop(1, '#08141f');
+        ctx.fillStyle = ocean;
+        ctx.fillRect(0, horizonY, width, height - horizonY);
+
+        const reflection = ctx.createLinearGradient(lighthouse.x, horizonY, lighthouse.x, height);
+        reflection.addColorStop(0, `rgba(255, 222, 184, ${lighthouse.alpha * 0.18})`);
+        reflection.addColorStop(0.28, `rgba(255, 202, 146, ${lighthouse.alpha * 0.08})`);
+        reflection.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = reflection;
+        ctx.beginPath();
+        ctx.moveTo(lighthouse.x - width * 0.008, horizonY);
+        ctx.lineTo(lighthouse.x + width * 0.008, horizonY);
+        ctx.lineTo(lighthouse.x + width * 0.07, height);
+        ctx.lineTo(lighthouse.x - width * 0.04, height);
+        ctx.closePath();
+        ctx.fill();
+
+        const t = timestamp * 0.00035;
+        for (let row = 0; row < 13; row += 1) {
+          const depth = row / 12;
+          const yBase = horizonY + height * 0.015 + depth * (height * 0.23);
+          const amplitude = lerp(1.2, 5.8, depth);
+          ctx.beginPath();
+          for (let x = -30; x <= width + 30; x += 18) {
+            const y = yBase
+              + Math.sin(x * 0.011 + t * 4.6 + row * 0.62) * amplitude
+              + Math.cos(x * 0.004 - t * 2.1 + row * 0.35) * amplitude * 0.42;
+            if (x === -30) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.strokeStyle = `rgba(239, 226, 209, ${0.05 + depth * 0.08})`;
+          ctx.lineWidth = 1 + depth;
+          ctx.stroke();
+        }
+      }
+
+      function drawBeach() {
+        ctx.fillStyle = '#4a3424';
+        ctx.beginPath();
+        ctx.moveTo(0, shorelineYAt(0));
+        for (let step = 0; step <= 24; step += 1) {
+          const ratio = step / 24;
+          ctx.lineTo(ratio * width, shorelineYAt(ratio));
+        }
+        ctx.lineTo(width, height);
+        ctx.lineTo(0, height);
+        ctx.closePath();
+        ctx.fill();
+
+        const wetSand = ctx.createLinearGradient(0, height * 0.66, 0, height);
+        wetSand.addColorStop(0, 'rgba(214, 160, 110, 0.18)');
+        wetSand.addColorStop(1, 'rgba(66, 43, 29, 0)');
+        ctx.fillStyle = wetSand;
+        ctx.beginPath();
+        ctx.moveTo(0, shorelineYAt(0) - height * 0.015);
+        for (let step = 0; step <= 24; step += 1) {
+          const ratio = step / 24;
+          ctx.lineTo(ratio * width, shorelineYAt(ratio) - height * 0.015);
+        }
+        ctx.lineTo(width, shorelineYAt(1) + height * 0.04);
+        ctx.lineTo(0, shorelineYAt(0) + height * 0.04);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(251, 237, 214, 0.28)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, shorelineYAt(0));
+        for (let step = 0; step <= 24; step += 1) {
+          const ratio = step / 24;
+          ctx.lineTo(ratio * width, shorelineYAt(ratio) + Math.sin(ratio * Math.PI * 3) * 2);
+        }
+        ctx.stroke();
+      }
+
+      function drawBeachStalls(timestamp) {
+        const sway = timestamp * 0.0011;
+        stallLayout.forEach((stall) => {
+          const x = stall.x * width;
+          const y = shorelineYAt(stall.x) - height * 0.17;
+          const w = width * 0.05 * stall.scale;
+          const h = height * 0.045 * stall.scale;
+          const glowAlpha = 0.26 + ((Math.sin(sway + stall.phase) + 1) * 0.5) * 0.18;
+
+          const glow = ctx.createRadialGradient(x, y + h * 0.5, 0, x, y + h * 0.5, w * 1.6);
+          glow.addColorStop(0, `rgba(255, 210, 150, ${glowAlpha})`);
+          glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          ctx.fillStyle = glow;
+          ctx.fillRect(x - w * 1.6, y - h * 0.8, w * 3.2, h * 2.8);
+
+          ctx.fillStyle = '#2b1c18';
+          ctx.fillRect(x - w * 0.4, y + h * 0.2, w * 0.08, h * 1.1);
+          ctx.fillRect(x + w * 0.32, y + h * 0.2, w * 0.08, h * 1.1);
+
+          ctx.fillStyle = '#4f3428';
+          ctx.beginPath();
+          ctx.moveTo(x - w * 0.62, y);
+          ctx.lineTo(x, y - h * 0.45);
+          ctx.lineTo(x + w * 0.62, y);
+          ctx.lineTo(x + w * 0.46, y + h * 0.18);
+          ctx.lineTo(x - w * 0.46, y + h * 0.18);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.fillStyle = `rgba(255, 224, 183, ${0.62 + glowAlpha * 0.3})`;
+          ctx.fillRect(x - w * 0.42, y + h * 0.18, w * 0.84, h * 0.44);
+        });
+      }
+
+      function drawVolleyballScene(timestamp) {
+        const centerX = width * 0.83;
+        const baseY = shorelineYAt(0.83) - height * 0.12;
+        const netWidth = width * 0.07;
+        const netHeight = height * 0.06;
+        const bounce = Math.sin(timestamp * 0.003) * height * 0.005;
+
+        ctx.strokeStyle = 'rgba(245, 234, 218, 0.38)';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(centerX - netWidth * 0.5, baseY);
+        ctx.lineTo(centerX - netWidth * 0.5, baseY - netHeight);
+        ctx.moveTo(centerX + netWidth * 0.5, baseY);
+        ctx.lineTo(centerX + netWidth * 0.5, baseY - netHeight);
+        ctx.moveTo(centerX - netWidth * 0.5, baseY - netHeight * 0.8);
+        ctx.lineTo(centerX + netWidth * 0.5, baseY - netHeight * 0.8);
+        ctx.stroke();
+
+        const figures = [
+          { x: centerX - netWidth * 0.72, phase: 0.1 },
+          { x: centerX - netWidth * 0.22, phase: 1.3 },
+          { x: centerX + netWidth * 0.25, phase: 2.2 },
+          { x: centerX + netWidth * 0.78, phase: 0.8 }
+        ];
+
+        ctx.strokeStyle = 'rgba(31, 21, 22, 0.95)';
+        ctx.fillStyle = 'rgba(31, 21, 22, 0.95)';
+        figures.forEach((figure) => {
+          const bob = Math.sin(timestamp * 0.0026 + figure.phase) * height * 0.004;
+          const y = baseY - height * 0.028 + bob;
+          ctx.beginPath();
+          ctx.arc(figure.x, y - height * 0.013, height * 0.006, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.moveTo(figure.x, y - height * 0.007);
+          ctx.lineTo(figure.x, y + height * 0.014);
+          ctx.lineTo(figure.x - width * 0.005, y + height * 0.03);
+          ctx.moveTo(figure.x, y + height * 0.014);
+          ctx.lineTo(figure.x + width * 0.005, y + height * 0.03);
+          ctx.moveTo(figure.x, y + height * 0.003);
+          ctx.lineTo(figure.x - width * 0.008, y + height * 0.01);
+          ctx.moveTo(figure.x, y + height * 0.002);
+          ctx.lineTo(figure.x + width * 0.008, y + height * 0.006);
+          ctx.stroke();
+        });
+
+        ctx.fillStyle = '#fff2df';
+        ctx.beginPath();
+        ctx.arc(centerX + netWidth * 0.1, baseY - netHeight - height * 0.012 + bounce, height * 0.0046, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function drawForegroundRelaxer(timestamp) {
+        const x = width * 0.14;
+        const y = shorelineYAt(0.14) + height * 0.05;
+        const sway = Math.sin(timestamp * 0.0013) * 2;
+
+        ctx.strokeStyle = 'rgba(20, 13, 11, 0.92)';
+        ctx.fillStyle = 'rgba(20, 13, 11, 0.92)';
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+        ctx.moveTo(x, y - height * 0.09);
+        ctx.lineTo(x, y + height * 0.02);
+        ctx.stroke();
+
+        ctx.fillStyle = '#69402e';
+        ctx.beginPath();
+        ctx.moveTo(x - width * 0.055, y - height * 0.09);
+        ctx.quadraticCurveTo(x - width * 0.008, y - height * 0.16 + sway, x + width * 0.06, y - height * 0.09);
+        ctx.lineTo(x + width * 0.048, y - height * 0.07);
+        ctx.quadraticCurveTo(x - width * 0.008, y - height * 0.13 + sway, x - width * 0.045, y - height * 0.07);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(35, 22, 19, 0.95)';
+        ctx.beginPath();
+        ctx.moveTo(x + width * 0.012, y - height * 0.01);
+        ctx.lineTo(x + width * 0.04, y - height * 0.05);
+        ctx.lineTo(x + width * 0.065, y - height * 0.05);
+        ctx.lineTo(x + width * 0.034, y);
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.fillStyle = 'rgba(31, 21, 19, 0.96)';
+        ctx.beginPath();
+        ctx.arc(x + width * 0.028, y - height * 0.058, height * 0.008, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(x + width * 0.024, y - height * 0.048);
+        ctx.lineTo(x + width * 0.046, y - height * 0.026);
+        ctx.lineTo(x + width * 0.058, y - height * 0.004);
+        ctx.lineTo(x + width * 0.072, y + height * 0.01);
+        ctx.stroke();
+      }
+
+      function drawShoreDetails(timestamp) {
+        drawBeachStalls(timestamp);
+        drawVolleyballScene(timestamp);
+        drawForegroundRelaxer(timestamp);
+      }
+
+      function drawOverlayText() {
+        ctx.font = '12px "Space Mono", monospace';
+        ctx.fillStyle = 'rgba(244, 228, 199, 0.28)';
+        ctx.fillText('NIKHIL DASWANI / PORTFOLIO', 18, height - 24);
+        ctx.textAlign = 'right';
+        ctx.fillText('FOCUS: TAX / ACCOUNTING / ANALYTICS', width - 18, 30);
+        ctx.textAlign = 'left';
+      }
+
+      function draw(timestamp) {
+        if (!started) return;
+        window.requestAnimationFrame(draw);
+        if (document.hidden) return;
+        if (!prefersReducedMotion && timestamp - lastFrame < 1000 / 30) return;
+
+        lastFrame = timestamp;
+        const horizonY = height * 0.56;
+
+        drawSky();
+        drawStars(timestamp);
+        const lighthouse = drawLighthouse(timestamp, horizonY);
+        drawOcean(timestamp, horizonY, lighthouse);
+        drawBeaconBeam(lighthouse, horizonY);
+        drawDistantCoastline(horizonY);
+        drawBeach();
+        drawShoreDetails(timestamp);
+        drawLighthouse(timestamp, horizonY);
+        drawOverlayText();
+      }
+
+      function updateActiveScene() {
+        const viewportCenter = window.innerHeight * 0.48;
+        let activeSection = sections[0];
+        let bestDistance = Number.POSITIVE_INFINITY;
+
+        sections.forEach((section) => {
+          const rect = section.getBoundingClientRect();
+          const center = rect.top + rect.height / 2;
+          const distance = Math.abs(center - viewportCenter);
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            activeSection = section;
+          }
+
+          const visible = rect.top < window.innerHeight * 0.8 && rect.bottom > window.innerHeight * 0.2;
+          section.classList.toggle('in-view', visible);
+        });
+
+        sceneName.textContent = activeSection.dataset.scene || '';
+        sceneLocation.textContent = activeSection.dataset.loc || '';
+        statusLocation.textContent = activeSection.dataset.loc || '';
+        progressValue.textContent = `${Math.round(currentProgress() * 100)}%`;
+
+        jumpButtons.forEach((button) => {
+          button.classList.toggle('active', button.dataset.jump === activeSection.id);
+        });
+      }
+
+      function enterWorld() {
+        if (started) return;
+        document.body.classList.add('entered');
+        gate.classList.add('hidden');
+        started = true;
+        resizeCanvas();
+        updateActiveScene();
+        window.requestAnimationFrame(draw);
+      }
+
+      jumpButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const target = document.getElementById(button.dataset.jump || '');
+          if (!target) return;
+          target.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
+        });
+      });
+
+      enterButton.addEventListener('click', enterWorld);
+      window.addEventListener('resize', () => {
+        resizeCanvas();
+        updateActiveScene();
+      }, { passive: true });
+      window.addEventListener('scroll', updateActiveScene, { passive: true });
+
+      resizeCanvas();
+      updateActiveScene();
+    })();
+  </script>
+</body>
+</html>
