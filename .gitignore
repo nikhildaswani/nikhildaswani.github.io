@@ -16,3 +16,6 @@ assets/logos/provided/*
 !assets/logos/provided/hr-block-logo.png
 !assets/logos/provided/pwc-logo.png
 !assets/logos/provided/my-cpe-one-logo.jpeg
+!assets/documents/
+assets/documents/*
+!assets/documents/Nikhil-Daswani-Resume.pdf

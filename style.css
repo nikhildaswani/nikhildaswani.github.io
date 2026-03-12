@@ -259,11 +259,19 @@ button {
     display: block;
 }
 
+.hero-credential-line {
+    margin-top: 1.15rem;
+    color: var(--ink-soft);
+    font-size: clamp(0.98rem, 1.55vw, 1.12rem);
+    font-weight: 700;
+    line-height: 1.5;
+}
+
 .hero-role {
-    margin-top: 1.2rem;
-    max-width: 26rem;
-    font-size: clamp(1.2rem, 2vw, 1.45rem);
-    font-weight: 600;
+    margin-top: 0.7rem;
+    max-width: 29rem;
+    font-size: clamp(1.2rem, 2vw, 1.48rem);
+    font-weight: 700;
     line-height: 1.45;
     color: var(--ink-soft);
 }
@@ -281,7 +289,7 @@ button {
 }
 
 .hero-summary {
-    margin-top: 1.2rem;
+    margin-top: 1rem;
     max-width: 34rem;
     font-size: 1.03rem;
 }

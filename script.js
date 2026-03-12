@@ -167,11 +167,11 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         {
             label: "Target roles",
-            value: "Tax Data Analyst / Tax Technology / Automation"
+            value: "Tax Technology / Tax Data Analyst / Financial Analyst"
         },
         {
             label: "Education",
-            value: "Master of Accountancy with Data Analytics"
+            value: "MAcc (Data Analytics)"
         }
     ];
 
