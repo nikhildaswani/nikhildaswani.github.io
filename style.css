@@ -1450,9 +1450,9 @@ button {
     }
 
     .hero-name-photo {
-        top: 3.15rem;
-        right: 3.55rem;
-        width: clamp(3rem, 15vw, 3.95rem);
+        top: 0.2rem;
+        right: 5.2rem;
+        width: clamp(4rem, 16vw, 4.95rem);
         border-width: 0.26rem;
     }
 
