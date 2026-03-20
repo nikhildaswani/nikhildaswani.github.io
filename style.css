@@ -960,12 +960,28 @@ button {
     margin-top: 1.2rem;
 }
 
+.project-meta {
+    display: grid;
+    gap: 0.45rem;
+}
+
 .project-highlight {
     color: var(--ink-faint);
     font-size: 0.82rem;
     font-weight: 800;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+}
+
+.project-link {
+    color: var(--accent-deep);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.project-link:hover {
+    text-decoration: underline;
 }
 
 .project-stack {

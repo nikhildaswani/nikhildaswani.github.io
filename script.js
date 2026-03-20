@@ -212,18 +212,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const projectItems = [
         {
             status: "Built",
-            title: "AI Bank Statement Parser",
-            summary: "An AI-assisted workflow that converts bank statements into a structured Excel workbook for review, analysis, and downstream reporting.",
+            title: "FinFlow MCR",
+            summary: "Built a hybrid bank statement extraction engine that combines deterministic PDF parsing, page classification, provider-based AI fallback, and review-first export into an audit-ready workflow.",
             bullets: [
-                "Captures date, description, debit, credit, balance, and notes in a standardized transaction table.",
-                "Creates separate sheets for all transactions, bank-wise detail, and consolidated summary totals.",
-                "Improves review readiness by turning unstructured statements into analysis-friendly output."
+                "Performs deterministic local parsing for native PDFs, classifies pages by extraction mode, and routes harder pages to Groq or Gemini fallback.",
+                "Normalizes output into a unified transaction schema with balance checks, OCR diagnostics, and source-level traceability across the review workflow.",
+                "Ships as a desktop review pipeline with setup, import, review, and export stages so users can inspect issues before generating the final workbook."
             ],
             highlight: "Built project",
+            href: "https://github.com/nikhildaswani/finflow-mcr-showcase",
+            linkLabel: "View showcase repo",
             stack: [
-                "AI extraction",
-                "Excel automation",
-                "Data structuring"
+                "Hybrid extraction",
+                "Groq + Gemini",
+                "PySide6 desktop"
             ]
         },
         {
@@ -696,7 +698,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 ${item.bullets.map((bullet) => `<li>${bullet}</li>`).join("")}
             </ul>
             <div class="project-footer">
-                <span class="project-highlight">${item.highlight}</span>
+                <div class="project-meta">
+                    <span class="project-highlight">${item.highlight}</span>
+                    ${item.href ? `<a class="project-link" href="${item.href}" target="_blank" rel="noreferrer">${item.linkLabel || "View project"}</a>` : ""}
+                </div>
                 <div class="project-stack">
                     ${item.stack.map((tool) => `<span>${tool}</span>`).join("")}
                 </div>
