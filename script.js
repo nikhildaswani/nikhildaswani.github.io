@@ -267,7 +267,7 @@ document.addEventListener("DOMContentLoaded", () => {
             company: "H&R Block",
             role: "Tax Analyst",
             location: "Rockford, IL",
-            period: "Dec 2025 - Present",
+            period: "Dec 2025 - April 2026",
             image: "assets/logos/provided/hr-block-logo.png",
             summary: "Support client-facing tax preparation across interviews, return preparation, notice support, and related accounting work.",
             bullets: [
